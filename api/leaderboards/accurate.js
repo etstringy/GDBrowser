@@ -7,7 +7,8 @@ let caches = [{"stars": null, "coins": null, "demons": null}, {"stars": null, "c
 
 module.exports = async (app, req, res, post) => {
 
-      if (!app.sheetsKey || app.endpoint != "http://boomlings.com/database/") return res.send([])
+      if (req.isGDPS) return res.send(req.server.weeklyLeaderboard ? "-3" : "-2")
+      if (!app.sheetsKey) return res.send([])
       let gdMode = post || req.query.hasOwnProperty("gd")
       let modMode = !gdMode && req.query.hasOwnProperty("mod")
       let cache = caches[gdMode ? 2 : modMode ? 1 : 0]
@@ -25,10 +26,15 @@ module.exports = async (app, req, res, post) => {
       let cellIndex = type == "demons" ? 2 : type == "coins" ? 1 : 0
       if (modMode) cellIndex += 3
 
-      let leaderboard = JSON.parse(tab.getCell(1, cellIndex).value)
+      let cell = tab.getCell(1, cellIndex).value
+      if (cell.startsWith("GoogleSpreadsheetFormulaError")) return res.send("-1")
+      let leaderboard = JSON.parse(cell)
 
       let gdFormatting = ""
-      leaderboard.forEach(x => gdFormatting += `1:${x.username}:2:${x.playerID}:13:${x.coins}:17:${x.usercoins}:6:${x.rank}:9:${x.icon.icon}:10:${x.icon.col1}:11:${x.icon.col2}:14:${forms.indexOf(x.icon.form)}:15:${x.icon.glow ? 2 : 0}:16:${x.accountID}:3:${x.stars}:8:${x.cp}:46:${x.diamonds}:4:${x.demons}|`)
+      leaderboard.forEach(x => {
+        app.userCache(req.id, x.accountID, x.playerID, x.username)
+        gdFormatting += `1:${x.username}:2:${x.playerID}:13:${x.coins}:17:${x.usercoins}:6:${x.rank}:9:${x.icon.icon}:10:${x.icon.col1}:11:${x.icon.col2}:14:${forms.indexOf(x.icon.form)}:15:${x.icon.glow ? 2 : 0}:16:${x.accountID}:3:${x.stars}:8:${x.cp}:46:${x.diamonds}:4:${x.demons}|`
+      })
       caches[modMode ? 1 : 0][type] = JSON.stringify(leaderboard)
       caches[2][type] = gdFormatting
       lastIndex[modMode ? 1 : 0][type] = Date.now()

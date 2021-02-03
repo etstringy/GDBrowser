@@ -1,12 +1,13 @@
 <head>
 	<title>[[USERNAME]]'s Profile</title>
 	<meta charset="utf-8">
-	<link href="../css/browser.css" type="text/css" rel="stylesheet">
+	<link href="../assets/css/browser.css" type="text/css" rel="stylesheet">
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135255146-3"></script><script>window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'UA-135255146-3');</script>
 	<link rel="icon" href="../icon/[[USERNAME]]">
 	<meta id="meta-title" property="og:title" content="[[USERNAME]]'s profile">
 	<meta id="meta-desc" property="og:description" content="Stars: [[STARS]] | Diamonds: [[DIAMONDS]] | Coins: [[COINS]] | User Coins: [[USERCOINS]] | Demons: [[DEMONS]] | CP: [[CP]]">
 	<meta id="meta-image" name="og:image" itemprop="image" content="https://gdbrowser.com/icon/[[USERNAME]]">
+	<meta name="twitter:card" content="summary">
 </head>
 
 <body class="levelBG" onbeforeunload="saveUrl()">
@@ -75,20 +76,25 @@
 
 	<div class="brownBox center supercenter" style="width: 135vh; height: 82%; margin-top: -0.7%">
 
-		<h1 class="veryBig inline">
-			<img class="inline valign" id="modBadge1" style="display: none; height: 7%; margin-right: -6%; cursor:help" src="../assets/mod.png" title="[[USERNAME]] is a moderator!">	
-			<img class="inline valign" id="modBadge2" style="display: none; height: 7%; margin-right: -6%; cursor:help" src="../assets/mod-elder.png" title="[[USERNAME]] is an elder moderator!">	
-			[[USERNAME]]
+		<div id="globalrank0" style="position: absolute; left: 0.3%; top: 1.5%; width: 18%; text-align: left">
+			<p style="margin: 0;"><img src="../assets/trophy.png" class="inline valign help" width="22%" title="Global Rank"> [[RANK]]</p>
+		</div>
+
+		<h1 class="veryBig inline" style="width: inherit">
+			<img class="inline valign" id="modBadge1" style="display: none; height: 7%; cursor:help" src="../assets/mod.png" title="[[USERNAME]] is a moderator!"><!--
+			--><img class="inline valign" id="modBadge2" style="display: none; height: 7%; cursor:help" src="../assets/mod-elder.png" title="[[USERNAME]] is an elder moderator!"><!--
+			--><img class="inline valign" id="modBadge3" style="display: none; height: 7%; cursor:help" src="../assets/mod-extra.png" title="[[USERNAME]] is a custom moderator! (tier [[MODERATOR]])"><!--	
+			--><span style="margin-left: 1%">[[USERNAME]]</span>
 		</h1>
 		
 		<hr style="margin-bottom: 2%">
 		<h3 id="collectibles">
-			<span id="stars">[[STARS]]</span> <img class="valign" src="../assets/star.png" style="cursor: help" title="Stars">
-			<span id="diamonds">[[DIAMONDS]]</span> <img class="valign" src="../assets/diamond.png" style="cursor: help" title="Diamonds">
-			<span id="coins">[[COINS]]</span> <img class="valign" src="../assets/coin.png" style="cursor: help" title="Secret Coins">
-			<span id="usercoins">[[USERCOINS]]</span> <img class="valign"src="../assets/silvercoin.png" style="cursor: help" title="User Coins">
-			<span id="demons">[[DEMONS]]</span> <img class="valign"src="../assets/demon.png" style="cursor: help" title="Demons">
-			<span id="creatorpoints" style="display: none"><span id="cp">[[CP]]</span> <img class="valign" src="../assets/cp.png" style="cursor: help" title="Creator Points"></span>
+			<span id="stars">[[STARS]]</span> <img class="help valign" src="../assets/star.png" title="Stars">
+			<span id="diamonds">[[DIAMONDS]]</span> <img class="help valign" src="../assets/diamond.png" title="Diamonds">
+			<span id="coins">[[COINS]]</span> <img class="help valign" src="../assets/coin.png" title="Secret Coins">
+			<span id="usercoins">[[USERCOINS]]</span> <img class="help valign"src="../assets/silvercoin.png" title="User Coins">
+			<span id="demons">[[DEMONS]]</span> <img class="help valign"src="../assets/demon.png" title="Demons">
+			<span id="creatorpoints" style="display: none"><span id="cp">[[CP]]</span> <img class="help valign" src="../assets/cp.png" title="Creator Points"></span>
 		</h3>
 
 		<div class="lightBox center" id="iconsDiv" style="margin: 2% auto; width: 105vh">
@@ -99,7 +105,7 @@
 			<img src="../icon/icon?form=wave&icon=[[WAVE]]&col1=[[COL1]]&col2=[[COL2]]&glow=[[GLOW]]" title="Wave [[WAVE]]" style="height: 7%">
 			<img src="../icon/icon?form=robot&icon=[[ROBOT]]&col1=[[COL1]]&col2=[[COL2]]&glow=[[GLOW]]" title="Robot [[ROBOT]]" >
 			<img src="../icon/icon?form=spider&icon=[[SPIDER]]&col1=[[COL1]]&col2=[[COL2]]&glow=[[GLOW]]" title="Spider [[SPIDER]]">
-			<img src="../deatheffects/[[DEATHEFFECT]].png" title="Death Effect [[DEATHEFFECT]]" id="deatheffect">
+			<img src="../assets/deatheffects/[[DEATHEFFECT]].png" title="Death Effect [[DEATHEFFECT]]" id="deatheffect">
 		</div>
 
 		<div class="lightBox center dragscroll" id="statusDiv" style="margin: 2% auto; width: 105vh; height: 35vh; background-color: #BE6F3F">
@@ -126,10 +132,6 @@
 			<a id="twitch"  style="display: none" target="_blank" href="https://twitch.tv/[[TWITCH]]"><img src="../assets/twitch.png" class="gdButton socialButton"></a>
 		</div>
 
-		<div id="globalrank0" style="position: absolute; left: 0.3%; top: 1.5%; width: 25%; text-align: left">
-			<p style="margin: 0;"><img src="../assets/trophy.png" class="inline valign" width="18%" style="cursor: help" title="Global Rank"> [[RANK]]</p>
-		</div>
-
 		<div class="supercenter" id="pageDown" style="left: 5%; top: 65%; height: 10%; display: none;">
 			<img class="gdButton" src="../assets/arrow-left.png" height="95%" onclick="page -= 1; appendComments()">
 		</div>
@@ -148,8 +150,8 @@
 
 </body>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script async type="text/javascript" src="../assets/sizecheck.js"></script>
-<script type="text/javascript" src="../assets/dragscroll.js"></script>
+<script type="text/javascript" src="../sizecheck.js?"></script>
+<script type="text/javascript" src="../dragscroll.js"></script>
 
 <script>
 
@@ -160,6 +162,7 @@ $('#message').html(messageText)
 $('#likeMessage').html(messageText.replace("profile posts", "liking posts").replace("postProfileComment", "like"))
 
 $('#modBadge[[MODERATOR]]').show()
+if ("[[MODERATOR]]" > 3) $('#modBadge3').show()
 $('#globalrank[[RANK]]').hide()
 
 let followed = localStorage.followed ? JSON.parse(localStorage.followed) : []
@@ -175,7 +178,7 @@ $('#followOff').click(function() {
 
 $('#followOn').click(function() {
 	followed = localStorage.followed ? JSON.parse(localStorage.followed) : []
-	localStorage.followed = JSON.stringify(followed.filter(x => x != [[ACCOUNTID]]))
+	localStorage.followed = JSON.stringify(followed.filter(x => x != '[[ACCOUNTID]]'))
 	$('#followOff').show()
 	$('#followOn').hide()
 })
@@ -191,7 +194,6 @@ if ([[CP]] > 0) $('#creatorpoints').show()
 if (`[[YOUTUBE]]` != "null") $('#youtube').show()
 if (`[[TWITTER]]` != "null") $('#twitter').show()
 if (`[[TWITCH]]` != "null")  $('#twitch').show()
-if (`[[DEATHEFFECT]]` == "undefined") $('#deatheffect').hide()
 
 let messages = "[[MESSAGES]]"
 let commenthistory = "[[COMMENTHISTORY]]"

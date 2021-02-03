@@ -3,14 +3,15 @@
 <head>
 	<title>GD Level Browser API</title>
 	<meta charset="utf-8">
-	<link rel="icon" href="../difficulty/auto.png">
+	<link rel="icon" href="../assets/difficulties/auto.png">
 	<link href="../assets/css/api.css" type="text/css" rel="stylesheet">
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
 	<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,600,700,800&display=swap" rel="stylesheet">
 	
 	<meta id="meta-title" property="og:title" content="GDBrowser API">
     <meta id="meta-desc" property="og:description" content="It's basically the Geometry Dash API, but not terrible!">
-	<meta id="meta-image" name="og:image" itemprop="image" content="https://gdbrowser.com/difficulty/auto.png">
+	<meta id="meta-image" name="og:image" itemprop="image" content="https://gdbrowser.com/assets/difficulties/auto.png">
+	<meta name="twitter:card" content="summary">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
@@ -27,7 +28,7 @@
 					<div class="category-content">
 						<a class="header-link" href="#level">Levels</a>
 						<a class="header-link" href="#search">Searching</a>
-						<a class="header-link" href="#mappacks">Map Packs</a>
+						<a class="header-link" href="#mappacks">Map Packs + Gauntlets</a>
 						<a class="header-link" href="#levelleaderboard">Level Leaderboards</a>
 					</div>
 				</div>
@@ -52,6 +53,7 @@
 					<div class="category-name">Misc</div>
 					<div class="category-content">
 						<a class="header-link" href="#analyze">Level Analysis</a> 
+						<a class="header-link" href="#artist">Song Verification</a> 
 						<a class="header-link" href="#icons">Icons</a> 
 					</div>
 				</div>
@@ -112,14 +114,14 @@
 			</div>
 
 			<br>
-			<p class="reveal" onclick="$('#response-level').slideToggle(100);"><b>Response (44)</b></p>
+			<p class="reveal" onclick="$('#response-level').slideToggle(100);"><b>Response (47)</b></p>
 			<div class="subdiv" id="response-level">
-				<p class="br">*Values that require a download are in <span style="color:red">red</span></p>
+				<p class="br">*Values that require a download are in <span style="color:red">red</span> and values that only work with daily/weekly levels are <span style="color:#00abee">blue</span></p>
 				<p>name: The name of the level</p>
 				<p>id: The ID of the level</p>
 				<p>description: The description</p>
 				<p>author: The name of the level's author (appears lower down in response)</p>
-				<p>authorID: The ID of the level's author</p>
+				<p>playerID: The unique player ID of the level's author</p>
 				<p>accountID: The account ID of the level's author. An ID of 0 indicates a green (unregistered) user</p>
 				<p>difficulty: The difficulty of the level (as a string). Includes demon rating</p>
 				<p>downloads: Number of downloads</p>
@@ -143,20 +145,23 @@
 				<p>objects: The number of objects in the level. This was added in a recent version of GD, so older levels will simply return 0</p>
 				<p>large: Whether the level is considered "large" (more than 40k objects)</p>
 				<p>cp: How many creator points the level is worth (1 for star rating, 1 for feature, and 1 for epic rating)</p>
-				<p>difficultyFace: The URL of the difficulty face image for this level. Plug it into gdbrowser.com/difficulty/{difficultyFace}.png</p>
+				<p>difficultyFace: The URL of the difficulty face image for this level. Plug it into gdbrowser.com/assets/difficulties/{difficultyFace}.png</p>
 				<p>songName: The name of the song used for the level</p>
 				<p>songAuthor: The name of the author of said song</p>
 				<p>songSize: The size of the song in megabytes, if a custom song was used</p>
 				<p>songID: The ID of the song (again). If a non-custom song was used, this will return a string with the level number of the song</p>
+				<p>songLink: The link to the raw MP3 of the song, if available</p>
 				<p>demonList: The level's position on the Demon List (Pointercrate). Extreme demons only</p>
 				<p class="red">uploaded: Time since the level was uploaded (sent as "x days/weeks/months" ago, since it's all the API sends)</p>
 				<p class="red">updated: Time since the level was last updated</p>
 				<p class="red">password: The password to copy the level. 0 means the level isn't copyable and 1 means it's free to copy</p>
-				<p class="red">editorTime: The amount of seconds spent in the editor</p>
+				<p class="red">editorTime: The amount of seconds spent in the editor (currently only works when using GDBrowser locally)</p>
 				<p class="red">totalEditorTime: The amount of seconds spent in the editor, including time from the level it was copied from</p>
 				<p class="red">ldm: If the level contains a checkbox for Low Detail Mode</p>
-				<p class="red">dailyNumber: Which daily/weekly the level is (e.g. 1000th daily level)</p>
-				<p class="red">weekly: If dailyNumber represents the weekly demon rather than the daily level</p>
+				<p class="blue">weekly: If the values below represent the weekly demon rather than the daily level</p>
+				<p class="blue">dailyNumber: Which daily/weekly the level is (e.g. 1000th daily level)</p>
+				<p class="blue">nextDaily: The amount of seconds until the daily/weekly level expires</p>
+				<p class="blue">nextDailyTimestamp: The Unix timestamp for when the daily/weekly level expires</p>
 				<p class="red">extraString: An unknown data string</p>
 				<p class="red">data: The actual data of the level, compressed with GZIP</p>
 			</div>
@@ -380,10 +385,11 @@
 	<main>
 		<div id="mappacks" class="anchor"></div>
 		<div class="main-block">
-			<h1>Map Packs</h1>
-			<p>/api/mappacks</p>
+			<h1>Map Packs + Gauntlets</h1>
+			<p>/api/mappacks or /api/gauntlets</p>
 
-			<p>Returns the list of map packs</p>
+			<p>Returns the list of map packs or gauntlets</p>
+			<p style="font-size: 14px">I'm putting this in the same section because they're basically the same lol</p>
 
 			<br>
 			<p class="reveal" onclick="$('#params-mappacks').slideToggle(100)"><b>Parameters (0)</b></p>
@@ -394,11 +400,11 @@
 			<br>
 			<p class="reveal" onclick="$('#response-mappacks').slideToggle(100)"><b>Response (8)</b></p>
 			<div class="subdiv" id="response-mappacks">
-				<p>The API will return an array of each map pack with the following information:</p>
-				<p>id: The ID of the map</p>
-				<p>name: The name of the pack</p>
-				<p>levels: An array of level IDs in the map pack. Fetch with /search/ using the ?list parameter</p>
-				<p>stars: The amount of stars rewarded for completing the pack</p>
+				<p class="br">*Values in <span style="color:#00abee">blue</span> are used in gauntlets, everything else is exclusive to map packs</p>
+				<p class="blue">id: The ID of the map pack, or index/type of the gauntlet</p>
+				<p class="blue">levels: An array of level IDs in the pack. Fetch with /search/ using the ?list parameter</p>
+				<p>name: The name of the map pack</p>
+				<p>stars: The amount of stars rewarded for completing the map pack</p>
 				<p>coins: Basically the only reason people play map packs LOL</p>
 				<p>difficulty: The (usually inaccurate) difficulty face of the map pack</p>
 				<p>barColor: The RGB color of the pack's progress bar</p>
@@ -499,7 +505,7 @@
 				<p>levelID: The ID of the level</p>
 				<p>browserColor: If the comment was posted through GDBrowser</p>
 				<p class="red">username: The commenter's username</p>
-				<p class="red">playerID: The commenter's ID</p>
+				<p class="red">playerID: The commenter's player ID</p>
 				<p class="red">accountID: The commenter's account ID</p>
 				<p class="red">percent: The commenter's percent on the level, if provided</p>
 				<p class="red">color: The RGB font color of the comment. Note that the yellow author text is not included</p>
@@ -526,47 +532,6 @@
 
 		</div>
 		<div class="seperator"></div>
-	</main>
-	
-	<main>
-		<div id="analyze" class="anchor"></div>
-		<div class="main-block">
-			<h1>Level Analysis</h1>
-			<p>/api/analyze/levelID</p>
-
-			<p>Analyzes a level's data</p>
-			<p><sb>Level analysis is updated a lot so there may be changes in the future</sb></p>
-
-			<br>
-			<p class="reveal" onclick="$('#params-analyze').slideToggle(100)"><b>Parameters (0)</b></p>
-			<div class="subdiv" id="params-analyze">
-				<p>No parameters for this one!</p>
-			</div>
-
-			<br>
-			<p class="reveal" onclick="$('#response-analyze').slideToggle(100)"><b>Response (12)</b></p>
-			<div class="subdiv" id="response-analyze">
-				<p><b>Response is subject to change in the future</b></p>
-				<p>The API will return an array of each player with the following information:</p>
-				<p>level: Basic level info (name, ID, author, etc)</p>
-				<p>settings: The level's settings (song offset, starting form/speed, two player mode, font, etc)</p>
-				<p>portals: A string listing the order of all the portals in the level + their percent. Does not include starting form/speed</p>
-				<p>orbs: How many of each jump ring is in the level</p>
-				<p>triggers: How many of each trigger is in the level</p>
-				<p>blocks: How many of each block type is in the level</p>
-				<p>triggerGroups: How many of each group ID is in the level</p>
-				<p>misc: Amount of objects that aren't categorized above (glow, arrows, clouds, pickups, etc)</p>
-				<p>colors: The level's initial color channels. Contains channel, R, G, B, opacity, player color, blending, and copied channel</p>
-				<p>text: An array of all the text objects in a level. ([text, percent])</p>
-				<p>dataLength: How long the level data is (spoilers - very)</p>
-				<p>data: The decrypted data of the level. And it's freakin' huge</p>
-			</div>
-
-			<br>
-		</div>
-
-		<div class="seperator"></div>
-
 	</main>
 
 	<main>
@@ -764,6 +729,83 @@
 		</main>
 
 	<main>
+		<div id="artist" class="anchor"></div>
+		<div class="main-block">
+			<h1>Song Verification</h1>
+			<p>/api/song/songID</p>
+
+			<p>Checks if a song is allowed for use</p>
+			<p>For a song to be useable, the artist must be scouted on Newgrounds and the song must be enabled for external use.
+			<br>If the song was published after March 2017, the artist must also be whitelisted by a GD moderator.</p>
+
+			<br>
+			<p class="reveal" onclick="$('#params-analyze').slideToggle(100)"><b>Parameters (0)</b></p>
+			<div class="subdiv" id="params-analyze">
+				<p>No parameters for this one!</p>
+			</div>
+
+			<br>
+			<p class="reveal" onclick="$('#response-analyze').slideToggle(100)"><b>Response (8)</b></p>
+			<div class="subdiv" id="response-analyze">
+				<p>error: Appears if the GD servers rejected the request or not</p>
+				<p>exists: If the provided song exists on Newgrounds</p>
+				<p>artist.name: The name of the artist</p>
+				<p>artist.scouted: If the artist was scouted by a Newgrounds member</p>
+				<p>artist.whitelisted: If the artist was whitelisted by a Geometry Dash moderator</p>
+				<p>song.name: The name of the song</p>
+				<p>song.externalUse: If the song is allowed for external use</p>
+				<p>song.allowed: If the song is allowed for use in GD</p>
+			</div>
+
+			<br>
+		</div>
+
+		<div class="seperator"></div>
+
+	</main>
+
+	<main>
+		<div id="analyze" class="anchor"></div>
+		<div class="main-block">
+			<h1>Level Analysis</h1>
+			<p>/api/analyze/levelID</p>
+
+			<p>Analyzes a level's data</p>
+			<p><sb>Level analysis is updated a lot so there may be changes in the future</sb></p>
+
+			<br>
+			<p class="reveal" onclick="$('#params-analyze').slideToggle(100)"><b>Parameters (0)</b></p>
+			<div class="subdiv" id="params-analyze">
+				<p>No parameters for this one!</p>
+			</div>
+
+			<br>
+			<p class="reveal" onclick="$('#response-analyze').slideToggle(100)"><b>Response (12)</b></p>
+			<div class="subdiv" id="response-analyze">
+				<p><b>Response is subject to change in the future</b></p>
+				<p>The API will return an array of each player with the following information:</p>
+				<p>level: Basic level info (name, ID, author, etc)</p>
+				<p>settings: The level's settings (song offset, starting form/speed, two player mode, font, etc)</p>
+				<p>portals: A string listing the order of all the portals in the level + their percent. Does not include starting form/speed</p>
+				<p>orbs: How many of each jump ring is in the level</p>
+				<p>triggers: How many of each trigger is in the level</p>
+				<p>blocks: How many of each block type is in the level</p>
+				<p>triggerGroups: How many of each group ID is in the level</p>
+				<p>misc: Amount of objects that aren't categorized above (glow, arrows, clouds, pickups, etc)</p>
+				<p>colors: The level's initial color channels. Contains channel, R, G, B, opacity, player color, blending, and copied channel</p>
+				<p>text: An array of all the text objects in a level. ([text, percent])</p>
+				<p>dataLength: How long the level data is (spoilers - very)</p>
+				<p>data: The decrypted data of the level. And it's freakin' huge</p>
+			</div>
+
+			<br>
+		</div>
+
+		<div class="seperator"></div>
+
+	</main>
+
+	<main>
 		<div id="icons" class="anchor"></div>
 		<div class="main-block">
 			<h1>Icons</h1>
@@ -814,7 +856,7 @@
 	</main>
 
 	<footer>
-		<p>API made by <a href="https://twitter.com/TheRealGDColon">GD Colon</a>. Webpage design by <a href="http://gducrash.tk">GD Ucrash</a><br><br>
+		<p>API made by <a href="https://twitter.com/TheRealGDColon">GD Colon</a>. Webpage design by <a href="https://twitter.com/GDUcrash">GD Ucrash</a><br><br>
 		Good job man, this looks really nice -Colon</p>
 	</footer>
 </body>

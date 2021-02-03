@@ -1,13 +1,14 @@
 <head>
 	<title>Messages</title>
 	<meta charset="utf-8">
-	<link href="../css/browser.css" type="text/css" rel="stylesheet">
+	<link href="../assets/css/browser.css?" type="text/css" rel="stylesheet">
 	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-135255146-3"></script>
 	<script>window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } gtag('js', new Date()); gtag('config', 'UA-135255146-3');</script>
 	<link rel="icon" href="../assets/messages.png">
 	<meta id="meta-title" property="og:title" content="Messages">
 	<meta id="meta-desc" property="og:description" content="Read, write, and manage your Geometry Dash messages!">
 	<meta id="meta-image" name="og:image" itemprop="image" content="https://gdbrowser.com/assets/messages.png">
+	<meta name="twitter:card" content="summary">
 </head>
 
 <body class="levelBG" onbeforeunload="saveUrl()">
@@ -83,16 +84,21 @@
 					<p class="bigger center" style="line-height: 6vh; margin-top: 1.5vh;">
 						Are you sure you want to <span style="color: #F05C5C">delete</span> this message?
 					</p>
-					<img src="../assets/btn-cancel.png" height=29%; class="gdButton center"
-						onclick="$('#confirmDelete').hide()">
-					<img src="../assets/btn-delete.png" height=29%; id="deleteCurrentMessage"
-						class="gdButton center sideSpaceB">
+					<img src="../assets/btn-cancel-green.png" height=29%; class="gdButton center" onclick="$('#confirmDelete').hide()">
+					<img src="../assets/btn-delete.png" height=29%; id="deleteCurrentMessage" class="gdButton center sideSpaceB">
 				</div>
 
 				<div id="deleting" style="display: none">
 					<h2 class="smaller center" style="font-size: 5.5vh">Delete</h2>
 					<p class="bigger center" style="line-height: 6vh; margin-top: 1.5vh;">Deleting message...</p>
 					<img src="../assets/loading.png" class="spin noSelect" style="height: 35%; margin-top: -2%">
+				</div>
+
+				<div id="delete-error" style="display: none;">
+					<img class="gdButton" src="../assets/close.png" style="width: 15%; position: absolute; top: -17.5%; left: -5.5vh" onclick="$('#delete-error').hide(); $('#confirmDelete').hide(); $('#preDelete').show()">
+					<img src="../assets/exclamation.png" style="height: 40%">
+					<p class="bigger" style="margin-bottom: 0%; margin-top: 2.5%">Something went wrong!</p>
+					<p id="delError" style="font-size: 2.4vh; margin-top: 1%"></p>
 				</div>
 			</div>
 		</div>
@@ -117,6 +123,13 @@
 							class="selectedAmount"></span>...</p>
 					<img src="../assets/loading.png" class="spin noSelect" style="height: 35%; margin-top: -2%">
 				</div>
+
+				<div id="bd-error" style="display: none;">
+					<img class="gdButton" src="../assets/close.png" style="width: 15%; position: absolute; top: -17.5%; left: -5.5vh" onclick="$('#bd-error').hide(); $('#bulkDelete').hide(); $('#preBulkDelete').show()">
+					<img src="../assets/exclamation.png" style="height: 40%">
+					<p class="bigger" style="margin-bottom: 0%; margin-top: 2.5%">Something went wrong!</p>
+					<p id="bdError" style="font-size: 2.4vh; margin-top: 1%"></p>
+				</div>
 			</div>
 		</div>
 
@@ -135,8 +148,7 @@
 					</div>
 					<div id="messageOptions">
 						<img class="gdButton" style="width: 8%" title="Reply" src="../assets/reply.png" id="replyButton">
-						<img class="gdButton" style="width: 8%" title="Delete" src="../assets/trash.png"
-							onclick="$('#confirmDelete').show()">
+						<img class="gdButton" style="width: 8%" title="Delete" src="../assets/trash.png" id="deleteButton" onclick="$('#confirmDelete').show()">
 					</div>
 				</div>
 			</div>
@@ -157,7 +169,7 @@
 					<img src="../assets/btn-cancel.png" height=10%; class="gdButton center"
 						onclick="$('textarea').val(''); $('#sendMessage').hide()">
 					<img src="../assets/btn-submit.png" height=10%; id="postMessage" class="gdButton center sideSpaceB">
-					<img src="../assets/refresh.png" style="height: 10%; position: absolute; right: 0%"
+					<img src="../assets/trash.png" style="height: 10%; position: absolute; right: 0%"
 						onclick="$('#postContent').val('');" class="gdButton center sideSpaceB">
 				</div>
 			</div>
@@ -204,14 +216,14 @@
 </body>
 
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script async type="text/javascript" src="../assets/sizecheck.js"></script>
+<script type="text/javascript" src="../sizecheck.js?"></script>
 <script>
 
 	let accountID;
 	let password;
 	let page = 0;
 	let messageID = 0;
-	let authorID = 0;
+	let playerID = 0;
 	let messages = [];
 	let messageStatus = {};
 	let cache = {};
@@ -236,7 +248,7 @@
 		$('#msgList').html('')
 		messages.forEach((x, y) => {
 			$('#msgList').append(`
-			<div messageID=${x.id} authorID="${x.accountID}" ${x.browserColor ? 'browserColor="true" ' : ""}class="commentBG gdMessage">
+			<div messageID=${x.id} playerID="${x.accountID}" ${x.browserColor ? 'browserColor="true" ' : ""}class="commentBG gdMessage">
 				<h3 style="color: ${x.browserColor ? 'rgb(120, 200, 255)' : 'white'}; font-size: ${x.subject.length > 35 ? "3" : x.subject.length > 30 ? "3.5" : x.subject.length > 25 ? "3.75" : "4"}vh">${x.subject}${x.unread ? " <span style='color:#00E600'>!</span>" : ""}</h3>
 				<h3 class="gold gdButton msgAuthor hitbox fit"><a href="../u/${x.author}" target="_blank">From: ${x.author}</a></h3>
 				<p class="msgDate">${x.date}</p>
@@ -267,27 +279,27 @@
 			if (!res || res == "-1") { $('.postbutton').show(); return $('#message').text("The username you provided doesn't exist!") }
 			else accountID = res.accountID
 
-			$.post("../messages", { password, accountID, count: true })
-				.done(count => {
-					$('#msgCount').html(`Loading <span style="color: yellow">${count}</span> unread messages...`)
-					$('#access').hide()
-					$('#loading').show()
+			// $.post("../messages", { password, accountID, count: true })
+			// 	.done(count => {
+			// 		$('#msgCount').html(`Loading <span style="color: yellow">${count}</span> unread messages...`)
+			// 		$('#access').hide()
+			// 		$('#loading').show()
 
 					$.post("../messages", { password, accountID })
 						.done(msgs => {
 							messages = msgs
-							$('#loading').hide()
+							$('#access').hide()
 							appendMessages()
 							$('#messages').show()
 
-							let targetUser = window.location.search.match(/\?sendTo=(.+)/)
+							let targetUser = window.location.search.match(/(\?|&)sendTo=(.+)/)
 							if (targetUser) {
-								targetUser = decodeURIComponent(targetUser[1])
+								targetUser = decodeURIComponent(targetUser[2])
 								fetch(`../api/profile/${targetUser}`).then(res => res.json()).then(res => { 
 									if (res == "-1" || !res) return;
 									$('#replyAuthor').html(`<a href="../u/${res.username}" target="_blank">To: ${res.username}</a>`)
 									messageStatus[res.accountID] = [res.messages, res.username]
-									authorID = res.accountID
+									playerID = res.accountID
 									if (res.messages == "all") $('#messageStatus').html(`<span style="color:yellow">${res.username}</span> has messages <span style="color:lime">enabled</span>`)
 									else if (res.messages == "friends") $('#messageStatus').html(`<span style="color:yellow">${res.username}</span> has messages set to <span style="color:orange">friends only</span>`)
 									else {
@@ -299,8 +311,8 @@
 								})
 							}
 
-						})
-						.fail(e => { $('#loadingicon').hide(); $('#msgCount').text(e.responseText.includes("DOCTYPE") ? "Something went wrong..." : e.responseText) })
+						// })
+						// .fail(e => { $('#loadingicon').hide(); $('#msgCount').text(e.responseText.includes("DOCTYPE") ? "Something went wrong..." : e.responseText) })
 
 				})
 				.fail(e => { $('.postbutton').show(); $('#message').text(e.responseText.includes("DOCTYPE") ? "Something went wrong..." : e.responseText) })
@@ -317,7 +329,7 @@
 			.done(msgs => {
 				messages = msgs
 				appendMessages()
-			})
+			}).fail(e => { $('#msgList').html("") })
 	}
 
 	$(document).on('click', '.hitbox', function (x) {
@@ -340,11 +352,15 @@
 
 	$(document).on('click', '.gdMessage', function () {
 		messageID = $(this).attr('messageID')
-		authorID = $(this).attr('authorID')
+		playerID = $(this).attr('playerID')
 		let subject = $(this).find('h3:first')
 		subject.html(subject.html().replace('<span style="color:#00E600">!</span>', "")) //lazy way to mark as read
+
+		$('#theMfMessage').attr('style', '')
 		$('#messageSubject').attr('style', `color: ${$(this).attr('browserColor') ? 'rgb(120, 200, 255)' : "white"}`).text(subject.text())
 		$('#messageAuthor').html($(this).find('.gdButton').html())
+		$('#replyButton').hide()
+		$('#deleteButton').hide()
 		$('#messageBody').text('').hide()
 		$('#messageLoad').show()
 		$('#selectedMessage').show()
@@ -356,6 +372,8 @@
 		if (cache[messageID]) {
 			$('#messageBody').attr('style', `color: ${cache[messageID][1] ? 'rgb(255, 140, 255)' : "white"}`).text(cache[messageID][0]).show()
 			$('#messageLoad').hide()
+			$('#replyButton').show()
+			$('#deleteButton').show()
 		}
 
 		else $.post("../messages/" + messageID, { password, accountID })
@@ -365,6 +383,8 @@
 				function loadMsg() {
 					$('#messageBody').attr('style', `color: ${msg.browserColor ? 'rgb(255, 140, 255)' : "white"}`).text(msg.content).show()
 					$('#messageLoad').hide()
+					$('#replyButton').show()
+				$('#deleteButton').show()
 				}
 
 				if (!messageStatus[msg.accountID]) fetch(`../api/profile/${msg.author}`).then(res => res.json()).then(res => { 
@@ -374,6 +394,13 @@
 				else {
 					loadMsg()
 				}
+			})
+			.fail(e => { 
+				$('#messageAuthor').html('&nbsp;')
+				$('#messageSubject').html('&nbsp;')
+				$('#messageLoad').hide() 
+				$('#messageBody').html(e.responseText).show()
+				$('#theMfMessage').attr('style', 'background-color: rgba(0, 0, 0, 0)')
 			})
 	})
 
@@ -391,6 +418,11 @@
 				$('#confirmDelete').hide()
 				$('#preDelete').show()
 				$('#deleting').hide()
+			})
+			.fail(e => { 
+				$('#deleting').hide()
+				$('#delete-error').show()
+				$('#delError').html(e.responseText)
 			})
 	})
 
@@ -418,15 +450,20 @@
 				}
 				allowEsc = true
 				$('#bulkDelete').hide()
-				$('#preBulkDelete').show()
 				$('#bulkDeleting').hide()
+				$('#preBulkDelete').show()
+			})
+			.fail(e => { 
+				$('#bulkDeleting').hide()
+				$('#bd-error').show()
+				$('#bdError').html(e.responseText)
 			})
 	})
 
 	$('#replyButton').click(function() {
-		if (!messageStatus[authorID]) return;
-		let status = messageStatus[authorID][0]
-		let name = messageStatus[authorID][1]
+		if (!messageStatus[playerID]) return;
+		let status = messageStatus[playerID][0]
+		let name = messageStatus[playerID][1]
 		$('#postMessage').removeClass('grayscale')
 		if (status == "all") $('#messageStatus').html(`<span style="color:yellow">${name}</span> has messages <span style="color:lime">enabled</span>`)
 		else if (status == "friends") $('#messageStatus').html(`<span style="color:yellow">${name}</span> has messages set to <span style="color:orange">friends only</span>`)
@@ -441,14 +478,14 @@
 	$('#postMessage').click(function () {
 		let subject = $('#postSubject').val()
 		let message = $('#postContent').val()
-		if (!subject || !message || !messageStatus[authorID] || messageStatus[authorID][0] == "off") return;
+		if (!subject || !message || !messageStatus[playerID] || messageStatus[playerID][0] == "off") return;
 		allowEsc = false
 		$('#reply-loading').show()
 		$('#reply-sent').hide()
 		$('#reply-error').hide()
 		$('#postingMessage').show()
 
-		$.post("../sendMessage/", { password, accountID, subject, message, targetID: authorID, color: true })
+		$.post("../sendMessage/", { password, accountID, subject, message, targetID: playerID, color: true })
 			.done(msg => {
 				$('#reply-loading').hide()
 				$('#reply-sent').show()

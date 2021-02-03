@@ -1,12 +1,13 @@
 <head>
 	<title>Comments</title>
 	<meta charset="utf-8">
-	<link href="../css/browser.css" type="text/css" rel="stylesheet">
+	<link href="../assets/css/browser.css?" type="text/css" rel="stylesheet">
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135255146-3"></script><script>window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'UA-135255146-3');</script>
 	<link rel="icon" href="../assets/like.png">
 	<meta id="meta-title" property="og:title" content="Level Comments">
     <meta id="meta-desc" property="og:description" content="View the comments of a Geometry Dash level!">
 	<meta id="meta-image" name="og:image" itemprop="image" content="https://gdbrowser.com/assets/like.png">
+	<meta name="twitter:card" content="summary">
 </head>
 
 <body class="levelBG" onbeforeunload="saveUrl()">
@@ -128,8 +129,8 @@
 
 </body>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script async type="text/javascript" src="../assets/sizecheck.js"></script>
-<script type="text/javascript" src="../assets/dragscroll.js"></script>
+<script type="text/javascript" src="../sizecheck.js?"></script>
+<script type="text/javascript" src="../dragscroll.js"></script>
 <script>
 
 let {mode, compact} = JSON.parse(localStorage.getItem('commentPreset') || '{"mode": "top", "compact": true}')
@@ -158,7 +159,12 @@ function clean(text) {return text.replace(/&/g, "&#38;").replace(/</g, "&#60;").
 
 $('#compactMode').attr('src', `../assets/compact-${compact ? "on" : "off"}.png`)
 
-fetch(target).then(res => res.json()).then(lvl => {
+Fetch(target).then(lvl => {
+
+	if (gdps) {
+		$('#leaveComment').hide()
+		$('#postComment').remove()
+	}
 
 	if (history) {
 
@@ -179,7 +185,7 @@ fetch(target).then(res => res.json()).then(lvl => {
 		if (lvl.accountID == undefined) $('#levelAuthor').remove()
 		else if (lvl.accountID == 0) {
 			$('#levelAuthor').addClass("green").addClass("unregistered")
-			$('#authorLink').attr('href', '../search/' + lvl.authorID + "?user")
+			$('#authorLink').attr('href', '../search/' + lvl.playerID + "?user")
 		}
 		else $('#authorLink').attr('href', '../u/' + lvl.author)
 		$('#levelName').text(lvl.name || ("Nonexistent level " + lvlID))
@@ -256,11 +262,11 @@ fetch(`../api${!history ? window.location.pathname : "/comments/" + lvl.playerID
 					<img class="inline" src="../icon/icon?form=${x.icon.form}&icon=${x.icon.icon}&col1=${x.icon.col1}&col2=${x.icon.col2}&glow=${x.icon.glow}&size=auto" height=21% style="margin-right: 0.8%">
 					<a href=../${x.accountID == "0" ? `search/${x.playerID}?user` : `../u/${userLink}`}>
 					<h2 class="inline gdButton ${x.accountID == "0" ? "green unregistered" : ""}">${userName}</h2></a>
-					${modNumber > 0 ? `<img class="inline" src="../assets/mod${modNumber == 2 ? "-elder" : ""}.png" height=18% style="margin-left: 0.6%;">` : ""}
+					${modNumber > 0 ? `<img class="inline" src="../assets/mod${modNumber > 2 ? "-extra" : modNumber == 2 ? "-elder" : ""}.png" height=18% style="margin-left: 0.6%;">` : ""}
 					<p class="commentPercent inline">${x.percent ? x.percent + "%" : ""}</p>
 
 					<div class="commentAlign">
-						<p class="pre commentText" style="color: rgb(${!history && x.playerID == lvl.authorID ? "255,255,75" : x.browserColor ? "255,180,255" : x.color})">${clean(x.content)}</p>
+						<p class="pre commentText" style="color: rgb(${!history && x.playerID == lvl.playerID ? "255,255,75" : x.browserColor ? "255,180,255" : x.color})">${clean(x.content)}</p>
 					</div>
 				</div>
 				<p class="commentDate" id="date-${x.ID}">${x.date}</p>
@@ -281,11 +287,11 @@ fetch(`../api${!history ? window.location.pathname : "/comments/" + lvl.playerID
 					<img class="inline" src="../icon/icon?form=${x.icon.form}&icon=${x.icon.icon}&col1=${x.icon.col1}&col2=${x.icon.col2}&glow=${x.icon.glow}&size=auto" height=21% style="margin-right: 0.8%">
 					<a href=../${x.accountID == "0" ? `search/${x.playerID}?user` : `../u/${userLink}`}>
 					<h2 class="inline gdButton ${x.accountID == "0" ? "green unregistered" : ""}">${userName}</h2></a>
-					${modNumber > 0 ? `<img class="inline" src="../assets/mod${modNumber == 2 ? "-elder" : ""}.png" height=18% style="margin-left: 0.6%;">` : ""}
+					${modNumber > 0 ? `<img class="inline" src="../assets/mod${modNumber > 2 ? "-extra" : modNumber == 2 ? "-elder" : ""}.png" height=18% style="margin-left: 0.6%;">` : ""}
 					<p class="commentPercent inline">${x.percent ? x.percent + "%" : ""}</p>
 
 					<div class="commentAlign">
-						<p class="pre commentText" style="color: rgb(${!history && x.playerID == lvl.authorID ? "255,255,75" : x.browserColor ? "255,180,255" : x.color})">${clean(x.content)}</p>
+						<p class="pre commentText" style="color: rgb(${!history && x.playerID == lvl.playerID ? "255,255,75" : x.browserColor ? "255,180,255" : x.color})">${clean(x.content)}</p>
 					</div>
 				</div>
 				<p class="commentDate compactDate" id="date-${x.ID}">${x.date}</p>
@@ -445,6 +451,7 @@ let likeCount, likeImg;
 let likedComments;
 
 $(document).on('click', '.likeComment', function(cmnt) {
+	if (gdps) return
 	commentID = $(this).attr('commentID')
 
 	likedComments = localStorage.likedComments ? JSON.parse(localStorage.likedComments) : []

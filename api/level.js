@@ -2,11 +2,9 @@ const request = require('request')
 const fs = require('fs')
 const Level = require('../classes/Level.js')
 
-function xor(str, key) { return Buffer.from(String.fromCodePoint(...str.split('').map((char, i) => char.charCodeAt(0) ^ key.charCodeAt(i % key.length)))).toString('base64') }
-
 module.exports = async (app, req, res, api, analyze) => {
 
-  if (app.offline) {
+  if (req.offline) {
     if (!api) return res.redirect('search/' + req.params.id)
     else return res.send("-1")
   }
@@ -22,9 +20,9 @@ module.exports = async (app, req, res, api, analyze) => {
 
   if (analyze || req.query.hasOwnProperty("download")) return app.run.download(app, req, res, api, levelID, analyze)
 
-  request.post(app.endpoint + 'getGJLevels21.php', req.gdParams({ str: levelID, type: 0 }), async function (err, resp, body) {
+  req.gdRequest('getGJLevels21', { str: levelID, type: 0 }, function (err, resp, body) {
 
-    if (err || !body || body == '-1' || body.startsWith("<!")) {
+    if (err || !body || body == '-1' || body.startsWith("<") || body.startsWith("##")) {
       if (!api) return res.redirect('search/' + req.params.id)
       else return res.send("-1")
     }
@@ -35,22 +33,10 @@ module.exports = async (app, req, res, api, analyze) => {
     song = app.parseResponse(song, '~|~')
 
     let levelInfo = app.parseResponse(preRes[0])
-    let level = new Level(levelInfo, false, author)
+    let level = new Level(levelInfo, req.server, false, author).getSongInfo(song)
 
-    if (song[2]) {
-      level.songName = song[2] || "Unknown"
-      level.songAuthor = song[4] || "Unknown"
-      level.songSize = (song[5] || "0") + "MB"
-      level.songID = song[1] || String(level.customSong)
-    }
-
-    else {
-      let foundSong = require('../misc/level.json').music[parseInt(levelInfo[12]) + 1] || { "null": true }
-      level.songName = foundSong[0] || "Unknown"
-      level.songAuthor = foundSong[1] || "Unknown"
-      level.songSize = "0MB"
-      level.songID = "Level " + [parseInt(levelInfo[12]) + 1]
-    }
+    if (req.isGDPS) level.gdps = (req.onePointNine ? "1.9/" : "") + req.endpoint
+    if (level.author != "-") app.userCache(req.id, level.accountID, level.playerID, level.author)
 
     function sendLevel() {
 
@@ -58,21 +44,24 @@ module.exports = async (app, req, res, api, analyze) => {
 
       else return fs.readFile('./html/level.html', 'utf8', function (err, data) {
         let html = data;
-        level.songName = level.songName.replace(/[^ -~]/g, "")  // strip off unsupported characters
+        let filteredSong = level.songName.replace(/[^ -~]/g, "")  // strip off unsupported characters
+        level.songName = filteredSong || level.songName
         let variables = Object.keys(level)
         variables.forEach(x => {
           let regex = new RegExp(`\\[\\[${x.toUpperCase()}\\]\\]`, "g")
           html = html.replace(regex, app.clean(level[x]))
         })
+        if (req.server.downloadsDisabled) html = html.replace('id="additional" class="', 'class="downloadDisabled ')
+          .replace('analyzeBtn"', 'analyzeBtn" style="filter: opacity(30%)"')
         return res.send(html)
       })
     }
 
-    if (level.difficulty == "Extreme Demon") {
-      request.get('http://www.pointercrate.com/api/v1/demons/?name=' + level.name.trim(), function (err, resp, demonList) {
+    if (req.server.demonList && level.difficulty == "Extreme Demon") {
+      request.get(req.server.demonList + 'api/v2/demons/?name=' + level.name.trim(), function (err, resp, demonList) {
           if (err) return sendLevel()
           let demon = JSON.parse(demonList)
-          if (demon[0] && demon[0].position <= 150) level.demonList = demon[0].position
+          if (demon[0] && demon[0].position) level.demonList = demon[0].position
           return sendLevel()
       })
   }

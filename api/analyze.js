@@ -1,9 +1,9 @@
 const zlib = require('zlib')
-const properties = require('../misc/objectProperties.json')
-const init = require('../misc/initialProperties.json')
-const colorStuff = require('../misc/colorProperties.json')
-const ids = require('../misc/objects.json')
-const blocks = require('../misc/blocks.json')
+const blocks = require('../misc/analysis/blocks.json')
+const colorStuff = require('../misc/analysis/colorProperties.json')
+const init = require('../misc/analysis/initialProperties.json')
+const properties = require('../misc/analysis/objectProperties.json')
+const ids = require('../misc/analysis/objects.json')
 
 module.exports = async (app, req, res, level) => {
     let unencrypted = level.data.startsWith('kS') // some gdps'es don't encrypt level data
@@ -145,7 +145,7 @@ function analyze_level(level, rawData) {
     }
 
     response.level = {
-        name: level.name, id: level.id, author: level.author, authorID: level.authorID, accountID: level.accountID, large: level.large
+        name: level.name, id: level.id, author: level.author, playerID: level.playerID, accountID: level.accountID, large: level.large
     }
 
     response.objects = data.length - 2
